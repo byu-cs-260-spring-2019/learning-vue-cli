@@ -7,7 +7,7 @@ Let's build the simple version of the help ticket application.
 First, install the packages we'll need for the server:
 
 ```
-npm install express mongoose
+npm install express
 ```
 
 Then, create a directory `server` in the top level of the project. Create a file in `server/server.js`:
