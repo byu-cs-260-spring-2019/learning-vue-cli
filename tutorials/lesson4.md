@@ -137,3 +137,10 @@ You should also remove the `axios` import since we are not using it here.
 ## What was the point?
 
 Your application should work the same as before. The benefits of Vuex come from managing state for large applications, and coordinating state changes between multiple components in your application. For example, it can be helpful to store a record for the currently logged in user in Vuex so that every component has access to it.
+
+
+## Deploying to Firebase
+
+Run ```npm run build``` on the front end to build your front end code and build it into the ```dist``` folder.  Since we told firebase to deploy the ```dist``` folder for the static files, it will look there.
+
+Then run ```firebase deploy --only hosting```
