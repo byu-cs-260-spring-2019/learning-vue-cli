@@ -10,53 +10,48 @@ First, install the packages we'll need for the server:
 npm install express
 ```
 
-Then, create a directory `server` in the top level of the project. Create a file in `server/server.js`:
+Then, initialize firebase
+```
+firebase init
+```
+- Select options for hosting, firestore, and functions
+- use the folder ```dist``` as public directory instead of "public"
+
+Then, in `functions/index.js`:
 
 ```
+const functions = require('firebase-functions');
+const firebase = require('firebase-admin');
 const express = require('express');
-const bodyParser = require("body-parser");
 
+const firebaseApp = firebase.initializeApp(
+    functions.config().firebase
+);
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
-
-const mongoose = require('mongoose');
-
-// connect to the database
-mongoose.connect('mongodb://localhost:27017/tickets', {
-  useNewUrlParser: true
-});
 
 const tickets = require("./tickets.js");
 app.use("/api/tickets", tickets);
 
-app.listen(3000, () => console.log('Server listening on port 3000!'));
+exports.app = functions.https.onRequest(app);
 ```
 
-Then, create a file in `server/tickets.js` containing:x
+Dont forget to modify your `firebase.json` file rewrites section!
+
+Then, create a file in `functions/tickets.js` containing:
 
 ```
-const mongoose = require('mongoose');
-const express = require("express");
+const functions = require('firebase-functions');
+const firebase = require('firebase-admin');
+const express = require('express');
 const router = express.Router();
 
-//
-// Tickets
-//
-
-const ticketSchema = new mongoose.Schema({
-  name: String,
-  problem: String,
-});
-
-const Ticket = mongoose.model('Ticket', ticketSchema);
-
+var db = firebase.firestore();
+var ticketsRef = db.collection('tickets');
+        
 router.get('/', async (req, res) => {
   try {
-    let tickets = await Ticket.find();
-    return res.send(tickets);
+    let querySnapshot = await ticketsRef.get();
+    res.send(querySnapshot.docs.map(doc => doc.data()));
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -64,28 +59,35 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const ticket = new Ticket({
-    name: req.body.name,
-    problem: req.body.problem
-  });
-  try {
-    await ticket.save();
-    return res.send(ticket);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(500);
-  }
+   let querySnapshot = await ticketsRef.get();
+   let numRecords = querySnapshot.docs.length;
+
+   let ticket = {
+      id: numRecords + 1,
+      name: req.body.name,
+      problem: req.body.problem
+    };
+  
+    ticketsRef.doc(ticket.id.toString()).set(ticket);
+    res.send(ticket);
 });
 
 router.delete('/:id', async (req, res) => {
-  try {
-    await Ticket.deleteOne({
-      _id: req.params.id
-    });
-    return res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    return res.sendStatus(500);
+  let id = req.params.id.toString();
+  var documentToDelete = ticketsRef.doc(id);
+  try{
+      var doc = await documentToDelete.get();
+      if(!doc.exists){
+          res.status(404).send("Sorry, that ticket doesn't exist");
+          return;
+      }
+      else{
+          documentToDelete.delete();
+          res.sendStatus(200);
+          return;
+      }
+  }catch(err){
+      res.status(500).send("Error deleting document: ",err);
   }
 });
 
@@ -117,7 +119,7 @@ module.exports = {
 For the rest of this lesson, we will be modifying the front end. While we do this, run the back end with:
 
 ```
-node server.js
+firebase serve
 ```
 
 Run the front end with:
