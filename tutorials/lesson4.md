@@ -4,7 +4,7 @@ The Vuex library helps you to manage the state of a large Vue application. You c
 
 Consider an application with many views and components. Many of them may need to store state for the application. If different components each store a list of tickets, for example, how do you keep them all in sync? If many components are calling a REST API on the server, how do you avoid having all of this logic scattered throughout the application?
 
-This is where Vuex can help Âou with state management.
+This is where Vuex can help out with state management.
 
 ## Overview of Vuex
 
