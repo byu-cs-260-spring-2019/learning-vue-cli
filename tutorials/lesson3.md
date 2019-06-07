@@ -273,7 +273,7 @@ Notice that the `script` section contains the Vue code you are used to writing. 
 Since we have not provided a way to create tickets yet, we can test it with:
 
 ```
-curl -X POST -d '{"name": "Daniel", "problem": "not another ticket system?!"}' -H "Content-Type: application/json" localhost:3000/api/tickets
+curl -X POST -d '{"name": "Daniel", "problem": "not another ticket system?!"}' -H "Content-Type: application/json" localhost:8080/api/tickets
 ```
 
 If you reload the web page for the app, you should see at least this newly created ticket, as well as any others left over in your database from previous activities.
