@@ -143,4 +143,4 @@ Your application should work the same as before. The benefits of Vuex come from 
 
 Run ```npm run build``` on the front end to build your front end code and build it into the ```dist``` folder.  Since we told firebase to deploy the ```dist``` folder for the static files, it will look there.
 
-Then cancel the ```firebase serve``` command that had been running for a while and run ```firebase deploy --only hosting```
+Then cancel the ```firebase serve``` command that had been running for a while and run ```firebase deploy```
